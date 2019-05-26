@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Math exp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <style type="text/css">
+        *{margin: 0;padding: 0;box-sizing: border-box;}
+        html{font-family: Georgia, '微软雅黑', Monospace;font-size: 25px;font-weight: 400;background: #fff;}
+        body{max-width: 1440px;margin: 0 auto;box-shadow: 0 0 15px #cbcbcb}
+        input,button{font-size: inherit;padding: 5px;line-height: 1;background: #fff;border: none;cursor: default;}
+        .control{
+            background: #272727;
+            padding: 15px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="c" style="display: block;">Your browser does not support canvas</canvas>
+
+<div class="control">
+    <button onclick="draw('c', false)">Clear</button>
+    <input type="text" id="line_0_exp" placeholder="Expression">
+    <input type="text" id="line_0_color" placeholder="Color">
+    <input type="text" id="line_0_mx" placeholder="Max_X">
+    <input type="text" id="line_0_my" placeholder="Max_Y">
+    <button onclick="try{
+        if (!draw('c', line_0_exp.value, line_0_color.value, line_0_mx.value*2, line_0_my.value*2)) {alert('Error !')}
+    }catch(e){alert('Error !')}">Draw</button>
+</div>
+
+<script type="text/javascript">
+c.width = document.body.clientWidth;
+c.height = document.documentElement.clientHeight - 50;
+
+window.onload = function(){
+  draw('c', 'sin X', '#272727', 4*Math.PI, 5);
+}
+
+function draw(id, exp, color, max_x, max_y){
+  if (typeof color == 'undefined' || color == '') {
+    var color = (function(m, s, c) {return (c ? arguments.callee(m, s, c - 1) : '#') + s[m.floor(m.random() * 16)]})(Math, '0123456789abcdef', 5);
+  }
+  if (max_x == 0 || max_y == 0) {
+    return false;
+  }
+  function transcoo(x, y) {
+    return {
+      x: ((w / 2) + (x * division_x)).toFixed(8),
+      y: ((h / 2) - (y * division_y)).toFixed(8)
+    };
+  }
+  function accAdd(arg1, arg2) {
+    var r1, r2, m;
+    try {
+      r1 = arg1.toString().split(".")[1].length
+    } catch(e) {
+      r1 = 0
+    }
+    try {
+      r2 = arg2.toString().split(".")[1].length
+    } catch(e) {
+      r2 = 0
+    }
+    m = Math.pow(10, Math.max(r1, r2));
+    return ((arg1 * m + arg2 * m) / m).toFixed(8);
+  }
+  function sleep(delay) {
+    var start = (new Date()).getTime();
+    while ((new Date()).getTime() - start < delay) {
+      continue;
+    }
+  }
+  function getCtrlPoint(ps, i, a, b) {
+    if (!a || !b) {
+      a = 0.25;
+      b = 0.25;
+    }
+    if (i < 1) {
+      var pAx = ps[0].x + (ps[1].x - ps[0].x) * a;
+      var pAy = ps[0].y + (ps[1].y - ps[0].y) * a;
+    } else {
+      var pAx = ps[i].x + (ps[i + 1].x - ps[i - 1].x) * a;
+      var pAy = ps[i].y + (ps[i + 1].y - ps[i - 1].y) * a;
+    }
+    if (i > ps.length - 3) {
+      var last = ps.length - 1
+      var pBx = ps[last].x - (ps[last].x - ps[last - 1].x) * b;
+      var pBy = ps[last].y - (ps[last].y - ps[last - 1].y) * b;
+    } else {
+      var pBx = ps[i + 1].x - (ps[i + 2].x - ps[i].x) * b;
+      var pBy = ps[i + 1].y - (ps[i + 2].y - ps[i].y) * b;
+    }
+    return {
+      pA: {
+        x: pAx,
+        y: pAy
+      },
+      pB: {
+        x: pBx,
+        y: pBy
+      }
+    }
+  }
+
+  var c = document.getElementById(id),
+  ctx = c.getContext('2d');
+  if (exp == false) {
+    ctx.clearRect(0,0,c.width,c.height);
+    return true;
+  }
+  var w = c.width,
+  h = c.height,
+  division_x = w / max_x,
+  division_y = h / max_y,
+  sort = [],
+  tmp,
+  tmp_,
+  addx = (max_x / division_x).toFixed(6),
+  sign_ = false;
+  ctx.beginPath();
+  ctx.strokeStyle = "#0f0f0f";
+  ctx.lineWidth = '1';
+  ctx.moveTo(w / 2, 0);
+  ctx.lineTo(w / 2, h);
+  ctx.moveTo(0, h / 2);
+  ctx.lineTo(w, h / 2);
+  ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = '3';
+  for (var i = Number(-max_x / 2).toFixed(8); i <= max_x / 2; i = accAdd(i, addx)) {
+    tmp = Mathast.run(exp.replace(/X/, '(' + i + ')')).result.value;
+    if (typeof tmp != 'number') {
+        return false;
+    }
+    sort.push({
+      y: Number(tmp.toFixed(8)),
+      x: Number(i)
+    });
+    sleep(2);
+  }
+  for (var i = 0; i < sort.length - 1; i++) {
+    tmp_ = getCtrlPoint(sort, i);
+    tmp = transcoo(tmp_.pA.x, tmp_.pA.y);
+    tmp_ = transcoo(tmp_.pB.x, tmp_.pB.y);
+    if (sign_) ctx.quadraticCurveTo(tmp.x, tmp.y, tmp_.x, tmp_.y);
+    ctx.moveTo(tmp.x, tmp.y);
+    sign_ = true;
+    sleep(2);
+  }
+  ctx.stroke();
+  ctx.closePath();
+  return true;
+}
+
+var Mathast = {
+  tokenizer: function tokenizer(exp) {
+    function isNumber(c) {
+      if (/[0-9\.]/.test(c)) return true;
+      return false;
+    }
+
+    function isLetter(c) {
+      if (/[a-z]/i.test(c)) return true;
+      return false;
+    }
+
+    function isOperator(c) {
+      if (/[\+\-\*\/]/.test(c)) return true;
+      return false;
+    }
+
+    exp = exp.split('');
+    var index = 0;
+    var tokens = [];
+    var char, tmp;
+
+    while (index < exp.length) {
+      char = exp[index];
+      tmp = "";
+
+      if (/\(|\)/.test(char)) {
+        tokens.push({
+          type: 'paren',
+          value: char
+        });
+        index++;
+        continue;
+      }
+
+      if (/\s/.test(char)) {
+        index++;
+        continue;
+      }
+
+      if (isNumber(char)) {
+        while (isNumber(char)) {
+          tmp += String(char);
+          char = exp[++index];
+          if (index >= exp.length) break;
+        }
+
+        tokens.push({
+          type: 'number',
+          value: tmp
+        });
+        continue;
+      }
+
+      if (isLetter(char)) {
+        while (isLetter(char)) {
+          tmp += char;
+          char = exp[++index];
+          if (index >= exp.length) break;
+        }
+
+        tokens.push({
+          type: 'name',
+          value: tmp
+        });
+        continue;
+      }
+
+      if (isOperator(char)) {
+        while (isOperator(char)) {
+          tmp += char;
+          char = exp[++index];
+          if (index >= exp.length) break;
+        }
+
+        tokens.push({
+          type: 'operator',
+          value: tmp
+        });
+        continue;
+      }
+
+      throw new TypeError('Unknown: ' + char);
+    }
+
+    return tokens;
+  },
+  parser: function parser(tokens) {
+    var index = 0;
+
+    function walk() {
+      var token = tokens[index];
+      var temp_params;
+
+      if (/number|operator/i.test(token.type)) {
+        index++;
+        return {
+          type: token.type + "Li",
+          value: token.value
+        };
+      }
+
+      if (token.type == 'name') {
+        index++;
+
+        if (['ln', 'sin', 'cos', 'lg', 'sqr', 'tan', 'squ'].indexOf(token.value) > -1) {
+          // only one param
+          temp_params = [walk()];
+        } else if (['log', 'pow', 'C', 'A'].indexOf(token.value) > -1) {
+          // two params
+          temp_params = [walk(), walk()];
+        } else if (['e', 'pi'].indexOf(token.value) > -1) {
+          switch (token.value) {
+            case 'e':
+              var nameValue = 'Math.E';
+              break;
+
+            case 'pi':
+              var nameValue = 'Math.PI';
+              break;
+
+            default:
+              throw new TypeError('Unknown: ' + token.value);
+          }
+
+          return {
+            type: 'numberLi',
+            value: nameValue
+          };
+        } else {
+          throw new TypeError("Unknown: " + token.value);
+        }
+
+        return {
+          type: token.type + "Li",
+          value: token.value,
+          params: temp_params
+        };
+      }
+
+      if (token.type == 'paren' && token.value == '(') {
+        var node = {
+          type: 'callExp',
+          arguments: []
+        };
+        token = tokens[++index];
+
+        while (token.type != 'paren' || token.type == 'paren' && token.value != ')') {
+          node.arguments.push(walk());
+          token = tokens[index];
+        }
+
+        index++;
+        return node;
+      }
+
+      throw new TypeError(token.type);
+    }
+
+    var AST = {
+      type: 'mathExp',
+      body: []
+    };
+
+    while (index < tokens.length) {
+      AST.body.push(walk());
+    }
+
+    return AST;
+  },
+  traverser: function traverser(AST, visior) {
+    function traverseArray(array, parent) {
+      array.forEach(function (child) {
+        traverseNode(child, parent);
+      });
+    }
+
+    function traverseNode(node, parent) {
+      var method = visior[node.type];
+
+      if (method) {
+        method(node, parent);
+      }
+
+      switch (node.type) {
+        case 'mathExp':
+          traverseArray(node.body, node);
+          break;
+
+        case 'callExp':
+          if (typeof node.params == 'undefined') traverseArray(node.arguments, node);else traverseArray(node.params, node);
+          break;
+
+        case 'numberLi':
+          break;
+
+        case 'nameLi':
+          break;
+
+        case 'operatorLi':
+          break;
+
+        default:
+          throw new TypeError(node.type);
+      }
+    }
+
+    traverseNode(AST, null);
+  },
+  transformer: function transformer(AST) {
+    var newAST = {
+      type: 'mathExp',
+      body: []
+    };
+    AST._context = newAST.body;
+    this.traverser(AST, {
+      numberLi: function numberLi(node, parent) {
+        parent._context.push({
+          type: 'numberLi',
+          value: node.value
+        });
+      },
+      nameLi: function nameLi(node, parent) {
+        parent._context.push({
+          type: 'nameLi',
+          value: node.value,
+          params: node.params
+        });
+      },
+      operatorLi: function operatorLi(node, parent) {
+        parent._context.push({
+          type: 'operatorLi',
+          value: node.value
+        });
+      },
+      callExp: function callExp(node, parent) {
+        var expression = {
+          type: 'callExp',
+          arguments: []
+        };
+        node._context = expression.arguments;
+
+        parent._context.push(expression);
+      }
+    });
+    return newAST;
+  },
+  run: function run(exp) {
+    var node = this.transformer(this.parser(this.tokenizer(exp)));
+
+    function solve(node) {
+      var result = "",
+          index = 0,
+          rc,
+          _result;
+
+      while (index < node.length) {
+        rc = node[index];
+
+        if (rc.type == 'nameLi') {
+          var firstP = rc.params[0].value;
+          if (typeof rc.params[1] != 'undefined') var secondP = rc.params[1].value;
+
+          switch (rc.value) {
+            case 'sin':
+              result += 'Math.sin(' + firstP + ')';
+              break;
+
+            case 'cos':
+              result += 'Math.cos(' + firstP + ')';
+              break;
+
+            case 'tan':
+              result += 'Math.tan(' + firstP + ')';
+              break;
+
+            case 'log':
+              result += 'Math.log(' + secondP + ', ' + firstP + ')';
+              break;
+
+            case 'ln':
+              result += 'Math.log(' + firstP + ', Math.E)';
+              break;
+
+            case 'lg':
+              result += 'Math.log(' + firstP + ', 10)';
+              break;
+
+            case 'pow':
+              result += 'Math.pow(' + firstP + ', ' + secondP + ')';
+              break;
+
+            case 'sqr':
+              result += 'Math.sqrt(' + firstP + ')';
+              break;
+
+            case 'squ':
+              result += 'Math.pow(' + firstP + ', 2)';
+              break;
+            case 'A':
+              var tmp = 1;
+
+              for (var i = 0; i < Number(secondP); i++) {
+                tmp = tmp * (Number(firstP) - i);
+              }
+
+              result += tmp;
+              break;
+
+            case 'C':
+              var tmp = 1,
+                  _tmp = 1;
+
+              for (var i = 0; i < Number(secondP); i++) {
+                tmp = tmp * (Number(firstP) - i);
+              }
+
+              for (var i = 0; i < Number(secondP); i++) {
+                _tmp = _tmp * (Number(secondP) - i);
+              }
+
+              result += tmp / _tmp;
+              break;
+
+            default:
+              throw new TypeError("Unknown: " + rc.value);
+          }
+        } else if (typeof rc.type == 'undefined' && rc.length > 0) {
+          result += rc.map(function (v) {
+            return v.value;
+          });
+        } else {
+          result += rc.value + (index != node.length - 1 ? ' ' : '');
+        }
+
+        index++;
+      }
+
+      try {
+        _result = eval(result);
+      } catch (e) {
+        _result = e;
+        console.log(_result);
+      }
+
+      return {
+        type: 'numberLi',
+        value: _result,
+        jscode: result
+      };
+    }
+
+    function hasExp(node) {
+      if (typeof node == 'undefined') return false;
+
+      if (node[0] != 'undefined') {
+        //is arr
+        var index = 0,
+            rc;
+
+        while (index < node.length) {
+          rc = node[index];
+          if (rc.type == 'callExp') return true;
+          if (rc.type == 'nameLi') if (hasExp(rc.params)) return true;
+          index++;
+        }
+
+        return false;
+      }
+
+      return false;
+    }
+
+    function anaNode(node) {
+      var foo = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var index = 0,
+          result = [],
+          rc;
+
+      if (typeof node[0] != 'undefined') {
+        while (index < node.length) {
+          rc = node[index];
+
+          if (rc.type == 'callExp') {
+            result.push(anaNode(rc.arguments));
+          } else if (rc.type == 'nameLi' && hasExp(rc.params)) {
+            result.push({
+              type: 'nameLi',
+              value: rc.value,
+              params: anaNode(rc.params, false)
+            });
+          } else {
+            result.push(rc);
+          }
+
+          index++;
+        }
+
+        if (foo) result = solve(result);
+        return result;
+      } else {
+        return node;
+      }
+    }
+
+    return {
+      ast: node,
+      result: anaNode(node.body)
+    };
+  }
+};
+
+
+
+
+</script>
+
+</body>
+</html>

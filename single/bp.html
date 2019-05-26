@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GG 导航</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style type="text/css" id="css">
+/*http://wx4.sinaimg.cn/large/005ShQFIgy1g2i98fjmprj31hc0u0dkn.jpg*/
+*{margin: 0;padding: 0;box-sizing: border-box;font-family: inherit;color: inherit;}
+html{color: #444;background-color: #fff;font-size: 16px;font-weight: 400;font-family: Georgia,"Microsoft YaHei","黑体";line-height: 1;background-image: url(../img/chuyin-bg.jpg);background-size: cover;background-attachment: fixed;background-repeat: no-repeat;}
+body{color: #444;min-width: 580px}iframe{display: block;}
+.search{margin: 150px auto;display: table;position: relative;font-size: 20px;border-radius: 3px;box-shadow: 0 0 45px rgb(198, 198, 198);-webkit-box-shadow: 0 0 45px rgb(198, 198, 198);white-space: nowrap;}
+.hid{display: none;}
+.search input[type="text"]{float: left;padding: 9px 10px 9px 35px;font-size: inherit;border: 1px solid transparent;border-right: none;width: 400px;border-radius: 3px 0 0 3px;-webkit-border-radius: 3px 0 0 3px;height: 42px;outline: none;}
+.search .button{float: left;padding: 10px 13px;background-color: #383838;border: 1px solid #383838;color: #bcbcbc;border-radius: 0 3px 3px 0;-webkit-border-radius: 0 3px 3px 0;cursor: pointer;height: 42px;}
+#list{position: absolute;background-color: #f9f9f9;list-style: none;display: none;border-radius: 0 0 3px 3px;-webkit-border-radius: 0 0 3px 3px;box-shadow: 0 20px 45px #d2d2d2;-webkit-box-shadow: 0 20px 45px #d2d2d2;z-index: 999999999;}
+#list li{padding: 6px 10px}
+#list a{text-decoration: none;color: inherit;}
+.cbox{max-width: 1228px;margin: 0 auto;text-align: center}
+.cbox .c{display: inline-block;padding: 50px;margin: 20px 3%;background: rgba(250,250,250,0.8);cursor: pointer;height: 120px;border-radius: 3px;box-shadow: 0 5px 5px rgba(0,0,0,0.1);-webkit-border-radius: 3px;-webkit-box-shadow: 0 5px 5px rgba(0,0,0,0.1);position: relative;}
+#iframe{width: 600px;height: 100vh;margin: 0 auto;border: none;}
+.search:before{
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: 9px;
+    width: 20px;
+    height: 20px;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACYAAAAmCAYAAACoPemuAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA4RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NTc3MiwgMjAxNC8wMS8xMy0xOTo0NDowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo3YWFlZmMzMy04ZTIwLTU4NGQtOWY1OS1mYjU2NWViNjdmMDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MTAwODE4QzcxQzAzMTFFNjk2QURDQjIzMkU1RjZGQ0UiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTAwODE4QzYxQzAzMTFFNjk2QURDQjIzMkU1RjZGQ0UiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6M2FmNWI0ZjAtOTY3MS04ZjQzLWJhMzItNjIzYjFjM2Q2MzQxIiBzdFJlZjpkb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NjI0YjVmZGMtMTdlYS0xMWU2LTg2ZmUtYmUxM2MwZDlhM2VhIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+c3bzIgAAA51JREFUeNrMmGtojXEcx58ddzZbmCKbe2Qubww1YiiXEMKGxAuFV164NNSE0hBSeGHl9gIbuRtSLrnOG9JIZkiuMWEaZjk+v3xXx2nP2dnZOc/869PvOc/zf37P9/z+198/zu/3O5GUnJycTpgkaAmf4U1eXt5PJ0olLlxhCOmFyYKxMBjig6r8hjK4DifhAkJ/xUwYgoZh1sL4oEcWpU/wAxKgMzQJeP4etsJOBH6PmjAEtcXsgPlWDyrhIpyFIj72Lqh+C8wQmAxTobcePYdF1L/UYGF8pB/mFFjzVcE2A+cfwmx2+yMTYROkqZnXwQZ8+CMShtN06x/QDu7BHJw9jnCANMWshlw1c76i56+XMHXwW5CsJsvCSWVDRxh+p2COQCvAZd6qsIXxsr1UDAOsD8E0HFRFa/hL3DFoBtPxfSJUfV/Ada5ElUJ2NEU5f8N02vTpZz5C29cpjEo9McvAwjcfJxVObMp2uArtNQXVGbHlCvEhRN2OkShHnX6pArCQgHR0FcbD1ti5+r3RiXFB3AP1YevT80JFbLxm7ru89MjxpuyXnRlKWKauzzneFVtBqm3NpcUS3IQN0vUdr1RpcJVo0u3vJqy7rsscb8tT2e5uwhJ1/dFjYeWyiW7CfE7jlN+1TPL/CKuZTJM8FlYz81e4CXseqq1jWLoF7NdqFfZQ10O8UsQUYXnCQK0Aj9yEXdP1OA+jlakkpoSpo9xNmO27LLsZxT/p6pGwmqXomOvMj2JLKo5L5DIPmrGbliKb+Q/WtbvYrPZezIt9Y6xtC9iWu4CgvAgpjAr3MXu19TmAuOYxitZszAxlXKvD3cGuhJcanbuU6URT1FDMHv1cQTBehiWMipa8ztK/WShxTaIkKl2DzLL3o3xrd13v+IJW/WIdA9goXQKncZrcQFELMJehg25lcK9PpAlvpoZyOy3ua2xzV58EBR9p6ugTdOuAZvuRdgBjcxn+nkRyRJCq4TxSt15BIZyBGzitruWdFMwkS/10+GL99Iv6lGVGbbg+DyPgNYx2ExfyUEUDIFupXeA08k1pXrma3fpOD0gJqGP398F6Pv42wGe89vw14ixypREdQ+HMpwiYyDGQ6lL1h3bCdu5xmA++d/EXr8gNdxMXF8nBndKu3kEHd9bUz8I9E9Nev0jiXknc0wYJi+LclqDIZQSL8zmNWJSU2Ki9CV3gik4FGldYgLiJAeIK/gthEvdV4gq1Qjh/BBgAV9ddwderLAcAAAAASUVORK5CYII=');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+@media screen and (max-width: 1400px){
+    .cbox .c{
+        padding: 30px 40px;
+        height: 80px;
+    }
+}
+::selection{
+    background: #383838;
+    color: #fff;
+};
+::-webkit-selection {
+    background: #383838;
+    color: #fff;
+}
+.foot{clear: both;text-align: center;padding: 150px 10px 15px 10px;text-shadow: 0 0 2px #eaeaea;-webkit-text-shadow: 0 0 2px #eaeaea;}
+@keyframes float{
+    0%{top: 0;transform: rotate(2deg);left: 0}
+    50%{top: 5px;transform: rotate(-2deg);left: 5px}
+    100%{top: 0;transform: rotate(2deg);left: 0}
+}
+@-webkit-keyframes float{
+    0%{top: 0;transform: rotate(2deg);left: 0}
+    50%{top: 5px;transform: rotate(-2deg);left: 5px}
+    100%{top: 0;transform: rotate(2deg);left: 0}
+}
+</style>
+</head>
+<body>
+
+<div id="wallpaper" style="position: fixed;width: 100%;height: 100%;z-index: 99999;top: 0;background: #272727;background-size: cover;background-image: url(https://uploadbeta.com/api/pictures/random/?key=BingEverydayWallpaperPicture)" ondblclick="$(this).fadeOut()"></div>
+
+<div class="search">
+    <form action="https://m.baidu.com/s" method="get" target="_blank" onsubmit="return beforesubmit()">
+        <input type="text" name="word" autocomplete="off">
+        <label><div class="button">BooM</div><button type="submit" class="hid"></button></label>
+    </form>
+</div>
+
+<div id="list"></div>
+
+<div class="cbox">
+    <div class="c" onclick="pageopen('https://m.baidu.com');">百度</div>
+    <div class="c" onclick="pageopen('https://m.weibo.cn');">微博</div>
+    <div class="c" onclick="pageopen('http://m.sohu.com');">搜狐</div>
+    <div class="c" onclick="pageopen('https://xw.qq.com');">腾讯</div>
+    <div class="c" onclick="pageopen('http://sina.cn');">新浪</div>
+    <div class="c" onclick="pageopen('http://gif.sina.cn','i');">GIF</div>
+    <div class="c" onclick="pageopen('https://fanyi.baidu.com');">翻译</div>
+    <div class="c" onclick="pageopen('https://baike.baidu.com', 'i');">百科</div>
+    <div class="c" onclick="pageopen('https://dy.kukutool.com/douyinweb', 'p');">抖音</div>
+    <div class="c" onclick="pageopen('http://m.weather.com.cn');">天气</div>
+
+    <div class="foot">&copy; 2019 <a href="http://dancheng.ha.cn">Luuljh</a>. Simplicity</div>
+</div>
+
+<iframe id="iframe" class="hid"></iframe>
+
+<script type="text/javascript">
+pass_permission = false;
+txt = $(".search input[name='word']")[0];
+oUl = $("#list")[0];
+org = txt.value;
+index = 0;
+ii = 0;
+setInterval(function(){
+    if (org == txt.value) {
+        return false;
+    }else{
+        org = txt.value;
+    }
+    var val = txt.value;
+    var oScript = document.createElement("script");
+    oScript.src = "https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd="+val+"&cb=callback";
+    document.body.appendChild(oScript);
+    document.body.removeChild(oScript);
+}, 500);
+$(document).click(function(){
+    $('#list').slideUp();
+});
+$('#list').click(function(event){
+    try{
+        event.stopPropagation();
+    }catch(e){
+        //do nothing
+    }
+});
+function callback(data){
+    oUl.innerHTML = "";
+    data.s.forEach(function(value){
+        var oLi = document.createElement("li");
+        oLi.innerHTML = "<a href=\"https://m.baidu.com/s?wd="+ value + "\">"+ value + "</a>";
+        oUl.appendChild(oLi);
+    })
+    $(oUl).slideDown();
+}
+$(function(){
+    $("#list").css({"top": ( $(".search input[name='word']").offset().top + 40 ), "left":$(".search input[name='word']").offset().left, "width": $(".search input[name='word']").outerWidth()});
+    var tmp_pd = $(window).height() - $(".search").outerHeight(true) - $(".cbox").height();
+    if (tmp_pd > 0){
+        tmp_pd = tmp_pd / 2;
+        $(".cbox").css({"padding-top":tmp_pd,"padding-bottom":tmp_pd})
+    }
+})
+$(".cbox .c").each(function(){
+    setTimeout(function(){
+        $(".cbox .c").eq(index).css({"animation":"float 2s infinite linear", "-webkit-animation":"float 2s infinite linear"});
+            index = index+1;
+    }, ii*200);
+    ii = ii + 1;
+});
+function pageopen(url, option){
+    if (typeof(option) == "undefined"){
+        option = "";
+    }
+    if (option.indexOf("p") != -1){
+        if (!pass_permission){
+            //ask for password
+            var now_pass = 11 * new Date().getMinutes() + "pass" + (new Date().getDate() * 5) + "o";
+            if (prompt("%" + new Date().getMinutes() + "% 需要密码:") == now_pass) {
+                pass_permission = true;
+                alert("已解锁");
+            }else{
+                alert("密码错误!");
+            }
+            return false;
+        }
+    }
+    if (option.indexOf("i") != -1){
+        $("#iframe")[0].src = url;
+        $("#iframe").css("height", $(window).height());
+        $(".search, #list, .cbox").fadeOut();
+        setTimeout(function(){
+            $(".search, #list, .cbox").remove();
+            $("#iframe").fadeIn();
+        }, 300);
+    }else{
+        window.location = url;
+    }
+}
+var touchtime = new Date().getTime();
+$("#wallpaper").on("click", function(){
+    if( new Date().getTime() - touchtime < 1000 ){
+        $("#wallpaper").fadeOut();
+    }else{
+        touchtime = new Date().getTime();
+        $("#wallpaper").css("background-image", "url(https://uploadbeta.com/api/pictures/random/?key=BingEverydayWallpaperPicture&nocachetoken=" + Math.random() + ")");
+    }
+});
+function beforesubmit(){
+    if (/抖音|douyin|xiao|小说/i.test(txt.value)) {
+        alert("禁止的关键字");
+        return false;
+    }else{
+        return true;
+    }
+}
+</script>
+
+</body>
+</html>
