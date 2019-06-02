@@ -26,10 +26,9 @@
     <button onclick="draw('c', false)">Clear</button>
     <input type="text" id="line_0_exp" placeholder="Expression">
     <input type="text" id="line_0_color" placeholder="Color">
-    <input type="text" id="line_0_mx" placeholder="Max_X">
-    <input type="text" id="line_0_my" placeholder="Max_Y">
+    <input type="text" id="line_0_mx" placeholder="Max">
     <button onclick="try{
-        if (!draw('c', line_0_exp.value, line_0_color.value, line_0_mx.value*2, line_0_my.value*2)) {alert('Error !')}
+        if (!draw('c', line_0_exp.value, line_0_color.value, line_0_mx.value).r) {alert('Error !')}
     }catch(e){alert('Error !')}">Draw</button>
 </div>
 
@@ -38,32 +37,21 @@ c.width = document.body.clientWidth;
 c.height = document.documentElement.clientHeight - 50;
 
 window.onload = function(){
-  draw('c', 'sin X', '#272727', 4*Math.PI, 5);
+  draw('c', 'tan X', '#d5aeae', 100);
 }
 
-function draw(id, exp, color, max_x, max_y){
+function draw(id, exp, color, max_x){
   if (typeof color == 'undefined' || color == '') {
     var color = (function(m, s, c) {return (c ? arguments.callee(m, s, c - 1) : '#') + s[m.floor(m.random() * 16)]})(Math, '0123456789abcdef', 5);
   }
-  if (max_x == 0 || max_y == 0) {
-    return false;
+  if (typeof max_x == 'undefined' || max_x == 0 || max_x == '') {
+    var max_x = 10;
   }
   function transcoo(x, y) {
     return {
       x: ((w / 2) + (x * division_x)),
       y: ((h / 2) - (y * division_y))
     };
-  }
-  function accAdd(arg1, arg2) {
-    arg1 = Math.floor(arg1 * 10000000);
-    arg2 = Math.floor(arg2 * 10000000);
-    return (arg1 + arg2) / 10000000;
-  }
-  function sleep(delay) {
-    var start = (new Date()).getTime();
-    while ((new Date()).getTime() - start < delay) {
-      continue;
-    }
   }
   var c = document.getElementById(id),
   ctx = c.getContext('2d');
@@ -74,12 +62,14 @@ function draw(id, exp, color, max_x, max_y){
   var w = c.width,
   h = c.height,
   division_x = w / max_x,
-  division_y = h / max_y,
+  division_y = h / max_x,
   sort = [],
+  sort_ = [],
   tmp,
   tmp_,
-  ss = [],
-  addx = max_x / 250,
+  trend = 'asc',
+  index = 0,
+  addx = 1/max_x,
   sign_ = false;
   ctx.beginPath();
   ctx.strokeStyle = "#0f0f0f";
@@ -93,16 +83,43 @@ function draw(id, exp, color, max_x, max_y){
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
-  for (var i = (-max_x / 2); i <= (max_x / 2); i = accAdd(i, addx)) {
-    tmp = Mathast.run(exp.replace(/X/, '(' + i + ')')).result.value;
-    if (typeof tmp == 'number') {
+  for (var i = (-max_x / 2); i <= (max_x / 2); i += addx) {
+    tmp = Mathast.run(exp.replace(/X/g, '(' + i + ')')).result.value;
+    if (typeof tmp == 'number' && !isNaN(tmp)) {
       sort.push({
           y: Number(tmp),
           x: Number(i)
       });
+      if (index > 0)
+        tmp_ = sort[(index - 1)].y - sort[index].y;
+      else
+        tmp_ = false;
+      if (tmp_ <= 0 && trend == 'desc' && tmp_ !== false) {
+        trend = 'asc';
+        tmp_ = true;
+      }else if (tmp_ >= 0 && trend == 'asc' && tmp_ !== false){
+        trend = 'desc';
+        tmp_ = true;
+      }else{
+        tmp_ = false;
+      }
+      if (tmp_ !== false) {
+        for (var j = sort[(index - 1)].x; j <= sort[index].x; j += addx / 20) {
+          tmp = Mathast.run(exp.replace(/X/g, '(' + j + ')')).result.value;
+          if (typeof tmp == 'number' && !isNaN(tmp)){
+            sort.push({
+              y: Number(tmp),
+              x: Number(j)
+            });
+          }
+        }
+      }
+      index = sort.length;
     }
-    sleep(2);
   }
+  sort.sort(function(a, b){
+    return a.x - b.x;
+  });
   for (var i = 0; i < sort.length; i++) {
     tmp = sort[i];
     tmp = transcoo(tmp.x, tmp.y);
@@ -111,17 +128,17 @@ function draw(id, exp, color, max_x, max_y){
     }else{
       ctx.moveTo(tmp.x, tmp.y);
     }
-    sleep(2);
+    tmp_++;
   }
   ctx.stroke();
-  ctx.closePath();
-  return true;
+  console.log(sort.length)
+  return {r: true, d: sort.length};
 }
 
 var Mathast = {
   tokenizer: function tokenizer(exp) {
     function isNumber(c) {
-      if (/[0-9\.]/.test(c)) return true;
+      if (/[0-9\.\-e]/.test(c)) return true;
       return false;
     }
 
@@ -223,19 +240,19 @@ var Mathast = {
       if (token.type == 'name') {
         index++;
 
-        if (['ln', 'sin', 'cos', 'lg', 'sqr', 'tan', 'squ'].indexOf(token.value) > -1) {
+        if (['ln', 'sin', 'cos', 'lg', 'sqr', 'tan', 'squ', 'abs'].indexOf(token.value) > -1) {
           // only one param
           temp_params = [walk()];
         } else if (['log', 'pow', 'C', 'A'].indexOf(token.value) > -1) {
           // two params
           temp_params = [walk(), walk()];
-        } else if (['e', 'pi'].indexOf(token.value) > -1) {
+        } else if (['E', 'PI'].indexOf(token.value) > -1) {
           switch (token.value) {
-            case 'e':
+            case 'E':
               var nameValue = 'Math.E';
               break;
 
-            case 'pi':
+            case 'PI':
               var nameValue = 'Math.PI';
               break;
 
@@ -383,39 +400,42 @@ var Mathast = {
 
           switch (rc.value) {
             case 'sin':
-              result += 'Math.sin(' + firstP + ')';
+              result += 'Math.sin('+firstP+')';
               break;
 
             case 'cos':
-              result += 'Math.cos(' + firstP + ')';
+              result += 'Math.cos('+firstP+')';
               break;
 
             case 'tan':
-              result += 'Math.tan(' + firstP + ')';
+              result += 'Math.tan('+firstP+')';
               break;
 
             case 'log':
-              result += 'Math.log(' + secondP + ', ' + firstP + ')';
+              result += 'Math.log('+secondP+', '+firstP+')';
               break;
 
             case 'ln':
-              result += 'Math.log(' + firstP + ', Math.E)';
+              result += 'Math.log('+firstP+', Math.E)';
               break;
 
             case 'lg':
-              result += 'Math.log(' + firstP + ', 10)';
+              result += 'Math.log('+firstP+', 10)';
               break;
 
             case 'pow':
-              result += 'Math.pow(' + firstP + ', ' + secondP + ')';
+              result += 'Math.pow('+firstP+', '+secondP+')';
               break;
 
             case 'sqr':
-              result += 'Math.sqrt(' + firstP + ')';
+              result += 'Math.sqrt('+firstP+')';
               break;
 
             case 'squ':
-              result += 'Math.pow(' + firstP + ', 2)';
+              result += 'Math.pow('+firstP+', 2)';
+              break;
+            case 'abs':
+              result += 'Math.abs('+firstP+')';
               break;
             case 'A':
               var tmp = 1;
@@ -455,18 +475,14 @@ var Mathast = {
 
         index++;
       }
-
-      try {
-        _result = eval(result);
-      } catch (e) {
-        _result = e;
-        console.log(_result);
+      try{
+          result = eval(result);
+      }catch(e){
+          console.log(e, "Code:" + result);
       }
-
       return {
         type: 'numberLi',
-        value: _result,
-        jscode: result
+        value: result,
       };
     }
 
@@ -474,7 +490,6 @@ var Mathast = {
       if (typeof node == 'undefined') return false;
 
       if (node[0] != 'undefined') {
-        //is arr
         var index = 0,
             rc;
 
@@ -516,7 +531,8 @@ var Mathast = {
           index++;
         }
 
-        if (foo) result = solve(result);
+        if (foo)
+            result = solve(result);
         return result;
       } else {
         return node;
