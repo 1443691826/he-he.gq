@@ -37,7 +37,7 @@ c.width = document.body.clientWidth;
 c.height = document.documentElement.clientHeight - 50;
 
 window.onload = function(){
-  draw('c', 'tan X', '#d5aeae', 100);
+  draw('c', 'tan X', '#d5aeae', 50);
 }
 
 function draw(id, exp, color, max_x){
@@ -67,10 +67,37 @@ function draw(id, exp, color, max_x){
   sort_ = [],
   tmp,
   tmp_,
-  trend = 'asc',
+  trend = ['asc', 0],
   index = 0,
-  addx = 1/max_x,
-  sign_ = false;
+  addx = max_x / 100,
+  sign_ = false,
+  calc = {
+  Add: function (arg1, arg2) {
+   arg1 = arg1.toString();
+   arg2 = arg2.toString();
+   var arg1Arr = arg1.split("."), arg2Arr = arg2.split("."), d1 = arg1Arr.length == 2 ? arg1Arr[1] : "", d2 = arg2Arr.length == 2 ? arg2Arr[1] : "";
+   var maxLen = Math.max(d1.length, d2.length);
+   var m = Math.pow(10, maxLen);
+   var result = Number(((arg1 * m + arg2 * m) / m).toFixed(maxLen));
+   var d = arguments[2];
+   return typeof d === "number" ? Number((result).toFixed(d)) : result;
+  },
+  Sub: function (arg1, arg2) {
+   return calc.Add(arg1, -Number(arg2), arguments[2]);
+  },
+  Mul: function (arg1, arg2) {
+   var r1 = arg1.toString(), r2 = arg2.toString(), m, resultVal, d = arguments[2];
+   m = (r1.split(".")[1] ? r1.split(".")[1].length : 0) + (r2.split(".")[1] ? r2.split(".")[1].length : 0);
+   resultVal = Number(r1.replace(".", "")) * Number(r2.replace(".", "")) / Math.pow(10, m);
+   return typeof d !== "number" ? Number(resultVal) : Number(resultVal.toFixed(parseInt(d)));
+  },
+  Div: function (arg1, arg2) {
+   var r1 = arg1.toString(), r2 = arg2.toString(), m, resultVal, d = arguments[2];
+   m = (r2.split(".")[1] ? r2.split(".")[1].length : 0) - (r1.split(".")[1] ? r1.split(".")[1].length : 0);
+   resultVal = Number(r1.replace(".", "")) / Number(r2.replace(".", "")) * Math.pow(10, m);
+   return typeof d !== "number" ? Number(resultVal) : Number(resultVal.toFixed(parseInt(d)));
+  }
+};
   ctx.beginPath();
   ctx.strokeStyle = "#0f0f0f";
   ctx.lineWidth = 1;
@@ -83,7 +110,7 @@ function draw(id, exp, color, max_x){
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
-  for (var i = (-max_x / 2); i <= (max_x / 2); i += addx) {
+  for (var i = calc.Div(-max_x, 2); i <= calc.Div(max_x, 2); i = calc.Add(i, addx)) {
     tmp = Mathast.run(exp.replace(/X/g, '(' + i + ')')).result.value;
     if (typeof tmp == 'number' && !isNaN(tmp)) {
       sort.push({
@@ -91,20 +118,35 @@ function draw(id, exp, color, max_x){
           x: Number(i)
       });
       if (index > 0)
-        tmp_ = sort[(index - 1)].y - sort[index].y;
+        tmp_ = calc.Sub(sort[(index - 1)].y, sort[index].y);
       else
         tmp_ = false;
-      if (tmp_ <= 0 && trend == 'desc' && tmp_ !== false) {
-        trend = 'asc';
+      if (tmp_ <= 0 && trend[0] == 'desc' && tmp_ !== false) {
+        trend = ['asc', tmp_];
         tmp_ = true;
-      }else if (tmp_ >= 0 && trend == 'asc' && tmp_ !== false){
-        trend = 'desc';
+      }else if (tmp_ >= 0 && trend[0] == 'asc' && tmp_ !== false){
+        trend = ['desc', tmp_];
         tmp_ = true;
       }else{
         tmp_ = false;
       }
+      if (tmp_ !== true) {
+        if (index - 2 >= 0){
+          tmp = calc.Div(calc.Sub(sort[(index - 2)].y, sort[(index - 1)].y), 2);
+          tmp_ = calc.Sub(sort[(index - 1)].y, sort[index].y);
+        }else{
+          tmp = 0;
+          tmp_ = 0;
+        }
+        if (Math.abs(tmp_) > Math.abs(tmp)){
+          tmp_ = true;
+          //console.log('fix');
+        }else{
+          tmp_ = false;
+        }
+      }
       if (tmp_ !== false) {
-        for (var j = sort[(index - 1)].x; j <= sort[index].x; j += addx / 20) {
+        for (var j = sort[(index - 1)].x; j <= sort[index].x; j = calc.Add(j ,calc.Div(addx, 50))) {
           tmp = Mathast.run(exp.replace(/X/g, '(' + j + ')')).result.value;
           if (typeof tmp == 'number' && !isNaN(tmp)){
             sort.push({
