@@ -37,7 +37,7 @@ c.width = document.body.clientWidth;
 c.height = document.documentElement.clientHeight - 50;
 
 window.onload = function(){
-  draw('c', 'tan X', '#d5aeae', 50);
+  draw('c', 'tan x', '#d5aeae', 69);
 }
 
 function draw(id, exp, color, max_x){
@@ -69,7 +69,7 @@ function draw(id, exp, color, max_x){
   tmp_,
   trend = ['asc', 0],
   index = 0,
-  addx = max_x / 100,
+  addx = max_x / 150,
   sign_ = false,
   calc = {
   Add: function (arg1, arg2) {
@@ -110,8 +110,9 @@ function draw(id, exp, color, max_x){
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
-  for (var i = calc.Div(-max_x, 2); i <= calc.Div(max_x, 2); i = calc.Add(i, addx)) {
-    tmp = Mathast.run(exp.replace(/X/g, '(' + i + ')')).result.value;
+  var i = calc.Div(-max_x, 2);
+  while ( i <= calc.Div(max_x, 2) ) {
+    tmp = Mathast.run(exp.replace(/x/ig, '(' + i + ')')).result.value;
     if (typeof tmp == 'number' && !isNaN(tmp)) {
       sort.push({
           y: Number(tmp),
@@ -140,24 +141,30 @@ function draw(id, exp, color, max_x){
         }
         if (Math.abs(tmp_) > Math.abs(tmp)){
           tmp_ = true;
-          //console.log('fix');
         }else{
           tmp_ = false;
         }
       }
       if (tmp_ !== false) {
-        for (var j = sort[(index - 1)].x; j <= sort[index].x; j = calc.Add(j ,calc.Div(addx, 50))) {
-          tmp = Mathast.run(exp.replace(/X/g, '(' + j + ')')).result.value;
+        for (var j = sort[(index - 1)].x; j <= sort[index].x; j = calc.Add(j, calc.Div(addx, 50))) {
+          tmp = Mathast.run(exp.replace(/X/ig, '(' + j + ')')).result.value;
           if (typeof tmp == 'number' && !isNaN(tmp)){
             sort.push({
               y: Number(tmp),
               x: Number(j)
             });
+          }else{
+            i = calc.Add(i, calc.Div(addx, 50));
+            continue;
           }
         }
       }
       index = sort.length;
+    }else{
+      i = calc.Add(i, calc.Div(addx, 50));
+      continue;
     }
+    i = calc.Add(i, addx);
   }
   sort.sort(function(a, b){
     return a.x - b.x;
