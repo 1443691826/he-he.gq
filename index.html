@@ -1,124 +1,51 @@
 <!DOCTYPE html>
 <html id="html" lang=zh>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Luuljh's page | Luuljh的个人页面</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="...............................">
-    <script src="//code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
-    <style type="text/css">
-*{margin: 0;padding: 0;box-sizing: border-box;-webkit-box-sizing: border-box;}
-html{
-    font-weight: 100;
-    font-family: Untitled,"Untitled Sans",Arial;
-    overflow: hidden;
-    height: 100%;
-    background-color: #323232;
-    font-size: 14px;
-}
-.bg{
-    width: 100%;
-    height: 100%;
-    animation: fbg 15s infinite;
-    -webkit-animation: fbg 15s infinite;
-    background-image: url(https://raw.githubusercontent.com/1443691826/he-he.gq/master/bg.jpg);
-    background-repeat: no-repeat;
-    background-position: right;
-    background-size: cover;
-    position: fixed;
-    top: 0;
-    z-index: 9;
-}
-body{
-    color: #d7e1e8;
-    line-height: 1.8;
-}
-a{color: inherit;text-decoration: none;border-bottom: 1px solid #c5c5c5;}
-.b{
-    padding: 45px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    text-shadow: 1px 1px 2px #009688;
-    z-index: 999;
-}
-.bd{
-    position: fixed;
-    top: 0;
-    z-index: 99;
-    height: 100%;
-    width: 100%;
-    box-shadow: 0 0 50px black inset;
-}
-li{list-style: none;}
-#closeabout{
-    display: inline-block;
-    cursor: pointer;
-    float: right;
-    line-height: 1;
-    font-size: 30px;
-    padding: 0 5px;
-    background-color: #ececec;
-}
-#about{
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    top: 0;
-    background: white;
-    color: #444;
-    padding: 10px;
-    border-radius: 5px;
-    min-width: 250px;
-    box-shadow: 0 0 50px #777777;
-    white-space: normal;
-    word-break: break-all;
-}
-@media screen and (max-width: 700px){
-    .b{
-        padding: 30px;
-        margin: 0 auto;
-    }
-}
-@media screen and (max-width: 400px){
-    .b{
-        padding: 20px;
-    }
-}
-@keyframes fbg{
-    0%{-webkit-transform: scale(1.05);transform: scale(1.05);}
-    50%{-webkit-transform: scale(1);transform: scale(1);}
-    100%{-webkit-transform: scale(1.05);transform: scale(1.05);}
-}
- 
-@-webkit-keyframes fbg{
-    0%{-webkit-transform: scale(1.05);transform: scale(1.05);}
-    50%{-webkit-transform: scale(1);transform: scale(1);}
-    100%{-webkit-transform: scale(1.05);transform: scale(1.05);}
-}
-    </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Luuljh's page | Luuljh的个人页面</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <style type="text/css">
+  *{margin: 0;padding: 0;box-sizing: border-box;}
+  html{font: 10vw/2.8em Georgia,"Helvetica Neue",Helvetica,Arial,sans-serif;}
+  h1,h2,h3{line-height: 2.1em;}
+  a{color: #fff;text-decoration: none;}
+  a:hover{text-decoration: underline;}
+  .detail p{font-size: 14px;line-height: 1.8em;padding: 20px;color: rgba(255,255,255,0.7);visibility: hidden;}
+  .detail:hover p{visibility: visible;}
+  li{list-style-type: none;text-align: center;line-height: 1em;padding: 10vh 15px;min-height: 300px;}
+  .t-ct{text-align: center;}
+  .foot{color: #6e6e6e;font-size: 14px;line-height: 50px;padding: 5vh 0;min-height: 200px;padding: 5vh}
+  </style>
 </head>
 <body>
 
-<div class="bg"></div>
-
-<div class="bd">
-<div class="b" id="cb">
-    <ul>
-        <li><a href="http://dancheng.ha.cn/about.html" title="更多信息">关于 / About</a></li>
-        <li><a href="https://music.163.com/#/playlist?id=448890749">音乐 / Songs</a></li>
-        <li><a href="https://github.com/1443691826">GITHUB / Code</a></li>
-        <li><a href="http://dancheng.ha.cn/blog">个人博客 / My blog</a></li>
-    </ul>
-    &copy; 2018 Luuljh [Mopter]
-</div><!-- b -->
-</div><!-- bd -->
-
-<script type="text/javascript">
-$(function(){
-    $("body").fadeIn(1024);
-});
-</script>
+<ul>
+  <li style="background: #e65a5a">
+    <div class="detail">
+      <p>Where I post my boring articles.</p>
+      <a href="http://dancheng.ha.cn/blog">Blog</a>
+    </div>
+  </li>
+  <li style="background: #2278ff">
+    <div class="detail">
+      <p>Meaningless code can be found there</p>
+      <a href="https://github.com/foxnes">Github</a>
+    </div>
+  </li>
+  <li style="background: #00c28b">
+    <div class="detail">
+      <p>A nice idea but quite low</p>
+      <a href="http://dancheng.ha.cn/about.html">About</a>
+    </div>
+  </li>
+  <li style="background: #292929">
+    <div class="detail">
+      <p>I hate listening to music in fact</p>
+      <a href="https://music.163.com/#/playlist?id=448890749">Music</a>
+    </div>
+  </li>
+  <li class="foot" style="background: #fff">&copy; 2019 Luuljh<br />FoXnEs</li>
+</ul>
 
 </body>
 </html>
