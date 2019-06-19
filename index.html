@@ -6,15 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <style type="text/css">
   *{margin: 0;padding: 0;box-sizing: border-box;}
-  html{font: 10vw/2.8em Georgia,"Helvetica Neue",Helvetica,Arial,sans-serif;}
+  html{font: 23vw/2.8em Georgia,"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
   h1,h2,h3{line-height: 2.1em;}
   a{color: #fff;text-decoration: none;}
   a:hover{text-decoration: underline;}
-  .detail p{font-size: 14px;line-height: 1.8em;padding: 20px;color: rgba(255,255,255,0.7);visibility: hidden;}
-  .detail:hover p{visibility: visible;}
-  li{list-style-type: none;text-align: center;line-height: 1em;padding: 10vh 15px;min-height: 300px;}
+  .detail p{font-size: 14px;line-height: 1.8em;padding: 20px;color: rgba(255,255,255,0.7);opacity: 0;transition: 1.5s}
+  ul li:hover .detail p{opacity: 1}
+  ul li a{transition: 0.5s;opacity: 0.3;font-size: 5vw;text-shadow: 0.15em 0.1em 10px rgba(0, 0, 0, 0.15);}
+  ul li:hover a{opacity: 1;font-size: inherit;}
+  ul li{list-style-type: none;text-align: center;line-height: 1em;padding: 10vh 15px;overflow: hidden;height: 80vw;}
+  @media screen and (orientation: landscape) {
+    ul li{height: 80vh}
+  }
+  @media screen and (orientation: portrait) and (max-width: 480px){
+    ul li{padding: 5vh 15px}
+  }
   .t-ct{text-align: center;}
-  .foot{color: #6e6e6e;font-size: 14px;line-height: 50px;padding: 5vh 0;min-height: 200px;padding: 5vh}
+  .foot{color: #6e6e6e;font-size: 14px;line-height: 50px;padding: 5vh 0;padding: 5vh 15px;height: auto;}
   </style>
 </head>
 <body>
@@ -40,7 +48,7 @@
   </li>
   <li style="background: #292929">
     <div class="detail">
-      <p>I hate listening to music in fact</p>
+      <p>I dislike listening to music exactly</p>
       <a href="https://music.163.com/#/playlist?id=448890749">Music</a>
     </div>
   </li>
