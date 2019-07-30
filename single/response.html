@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>RT - fasten your response time</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <style type="text/css">
+    #falsebutton,
+    #truebutton {
+      width: 50vw;
+      height: 40vh;
+      position: fixed;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(125, 125, 0, 0.5);
+    }
+    
+    #falsebutton {
+      left: 0
+    }
+    
+    #truebutton {
+      right: 0;
+      background: rgba(0, 125, 125, 0.5);
+    }
+  </style>
+</head>
+
+<body id="myscreen">
+
+
+  <div id="falsebutton">FALSE</div>
+
+  <div id="truebutton">TRUE</div>
+
+  <p>说明：看下面的提示的颜色，若与屏幕显示的背景颜色一样，则点击TRUE，否则点击FALSE，一共有5种颜色(['red', 'purple', 'orange', 'yellow', 'green'])，每次游戏有20轮。键盘上的左箭头对应FALSE，下箭头对应开始游戏，右箭头对应TRUE</p>
+
+  <h1>提示：<span id="nextColor">游戏未开始</span></h1>
+
+  <p onclick="changeLevel(1)"></p>
+
+  <button onclick="_gameStart()" style="background: rgba(0, 0, 0, 0.15);border: none"><h1>开始</h1></button>
+
+  <p id="result"></p>
+
+  <script type="text/javascript">
+    var color = ['red', 'purple', 'orange', 'yellow', 'green'];
+
+    function _gameStart() {
+      gameData = [];
+      result.innerText = null;
+      index = -1;
+      gameStart();
+    }
+
+    function gameStart() {
+      realColor = color[Math.floor(Math.random() * color.length)];
+      BgColor = color[Math.floor(Math.random() * color.length)];
+      if (index < 19) {
+        nextColor.innerText = realColor;
+        myscreen.style.background = BgColor;
+        startTime = new Date().getTime();
+      } else {
+        var timeused = 0,
+          count = [0, 0];
+        gameData.map(function(item) {
+          timeused += item[1] / 1000;
+          if (item[0]) {
+            count[0]++;
+          } else {
+            count[1]++;
+          }
+        });
+        result.innerText = '游戏结束。中共用时：' + timeused + 's / 正确个数：' + count[0] + ' / 错误个数：' + count[1];
+      }
+      index++;
+    }
+
+    falsebutton.onclick = function() {
+      if (result.innerText != "") {
+        return '';
+      }
+      if (BgColor != realColor) {
+        var AS = true;
+      } else {
+        var AS = false;
+      }
+      gameData[index] = [AS, new Date().getTime() - startTime];
+      gameStart();
+    }
+    truebutton.onclick = function() {
+      if (result.innerText != "") {
+        return '';
+      }
+      if (BgColor == realColor) {
+        var AS = true;
+      } else {
+        var AS = false;
+      }
+      gameData[index] = [AS, new Date().getTime() - startTime];
+      gameStart();
+    }
+
+    myscreen.onkeydown = function(e) {
+      var keynum;
+      var keychar;
+      keynum = window.event ? e.keyCode : e.which;
+      if (keynum == 37) {
+        falsebutton.onclick();
+      } else if (keynum == 39) {
+        truebutton.onclick();
+      } else if (keynum == 40) {
+        _gameStart();
+      }
+
+    }
+  </script>
+
+</body>
+
+</html>
